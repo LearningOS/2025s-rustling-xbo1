@@ -2,7 +2,6 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -37,7 +36,18 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        self.heapify_up(self.count);
+    }
+    fn heapify_up(&mut self, mut idx: usize) {
+        while self.parent_idx(idx) > 0 {
+            let parent_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                self.items.swap(idx, parent_idx);
+            }
+            idx = parent_idx;
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +67,17 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        if self.right_child_idx(idx) > self.count {
+            self.left_child_idx(idx)
+        } else {
+            let left_child_idx = self.left_child_idx(idx);
+            let right_child_idx = self.right_child_idx(idx);
+            if (self.comparator)(&self.items[left_child_idx], &self.items[right_child_idx]) {
+                left_child_idx
+            } else {
+                right_child_idx
+            }
+        }
     }
 }
 
@@ -84,8 +103,22 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.count == 0 {
+            return None;
+        }
+        let next = self.items.swap_remove(1);
+        self.count -= 1;
+        if self.count > 0 {
+            let mut idx = 1;
+            while self.children_present(idx) {
+                let smallest_child_idx = self.smallest_child_idx(idx);
+                if (self.comparator)(&self.items[smallest_child_idx], &self.items[idx]) {
+                    self.items.swap(smallest_child_idx, idx);
+                }
+                idx = smallest_child_idx;
+            }
+        }
+        Some(next)
     }
 }
 
